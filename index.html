@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiRuang FEB — Sistem Manajemen Ruang Kelas</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-block">
+        <div class="logo-icon">FEB</div>
+        <div>
+          <div class="logo-title">SiRuang</div>
+          <div class="logo-sub">Sistem Informasi Ruang Kelas</div>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+        <button class="nav-btn" data-view="jadwal">Jadwal</button>
+        <button class="nav-btn" data-view="booking">Booking</button>
+        <button class="nav-btn" data-view="log">Riwayat</button>
+      </nav>
+      <div class="header-clock" id="clock">--:--:--</div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN APP ===== -->
+  <main class="app-main">
+
+    <!-- ======== VIEW: DASHBOARD ======== -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Denah Ruang Kelas</h1>
+          <p class="page-sub" id="date-display"></p>
+        </div>
+        <div class="filter-row">
+          <select id="filter-floor" class="filter-select">
+            <option value="all">Semua Lantai</option>
+            <option value="1">Lantai 1</option>
+            <option value="2">Lantai 2</option>
+          </select>
+          <select id="filter-slot" class="filter-select">
+            <option value="current">Slot Aktif</option>
+            <option value="all">Semua Slot</option>
+            <option value="0">07:00 – 09:00</option>
+            <option value="1">09:00 – 11:00</option>
+            <option value="2">11:00 – 13:00</option>
+            <option value="3">13:00 – 15:00</option>
+            <option value="4">15:00 – 17:00</option>
+          </select>
+          <button class="btn-primary" onclick="openBookingModal()">+ Booking Ruang</button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-row">
+        <span class="legend-item"><span class="dot dot-available"></span> Tersedia</span>
+        <span class="legend-item"><span class="dot dot-occupied"></span> Sedang Digunakan</span>
+        <span class="legend-item"><span class="dot dot-org"></span> Kegiatan Organisasi</span>
+        <span class="legend-item"><span class="dot dot-booked"></span> Sudah Dipesan</span>
+        <span class="legend-item"><span class="dot dot-cancelled"></span> Dibatalkan</span>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar" id="stats-bar"></div>
+
+      <!-- Floor 1 -->
+      <div class="floor-section" id="floor1-section">
+        <div class="floor-label">
+          <span>Lantai 1</span>
+          <span class="floor-range">C1.001 – C1.012</span>
+        </div>
+        <div class="room-grid" id="grid-floor1"></div>
+      </div>
+
+      <!-- Floor 2 -->
+      <div class="floor-section" id="floor2-section">
+        <div class="floor-label">
+          <span>Lantai 2</span>
+          <span class="floor-range">C2.013 – C2.022</span>
+        </div>
+        <div class="room-grid" id="grid-floor2"></div>
+      </div>
+    </section>
+
+    <!-- ======== VIEW: JADWAL ======== -->
+    <section class="view" id="view-jadwal">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Jadwal Penggunaan</h1>
+          <p class="page-sub">Tampilan timeline semua ruangan hari ini</p>
+        </div>
+        <div class="filter-row">
+          <select id="jadwal-floor" class="filter-select">
+            <option value="all">Semua Lantai</option>
+            <option value="1">Lantai 1</option>
+            <option value="2">Lantai 2</option>
+          </select>
+        </div>
+      </div>
+      <div class="timeline-container" id="timeline-container"></div>
+    </section>
+
+    <!-- ======== VIEW: BOOKING ======== -->
+    <section class="view" id="view-booking">
+      <div class="page-header">
+        <h1 class="page-title">Formulir Booking Ruang</h1>
+        <p class="page-sub">Reservasi ruang kelas untuk kegiatan akademik maupun organisasi</p>
+      </div>
+      <div class="form-container">
+        <form id="main-booking-form" onsubmit="submitBookingForm(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Jenis Kegiatan</label>
+              <select id="f-type" onchange="toggleFormFields()" required>
+                <option value="">-- Pilih --</option>
+                <option value="academic">Akademik (Perkuliahan)</option>
+                <option value="org">Kegiatan Organisasi</option>
+                <option value="exam">Ujian</option>
+                <option value="extra">Kegiatan Tambahan</option>
+              </select>
+            </div>
+            <div class="form-group" id="fg-prodi">
+              <label>Program Studi</label>
+              <select id="f-prodi">
+                <option value="">-- Pilih --</option>
+                <option value="Manajemen">Manajemen</option>
+                <option value="Akuntansi">Akuntansi</option>
+              </select>
+            </div>
+            <div class="form-group" id="fg-semester">
+              <label>Semester</label>
+              <select id="f-semester">
+                <option value="">-- Pilih --</option>
+                <option value="1">Semester 1</option>
+                <option value="3">Semester 3</option>
+                <option value="5">Semester 5</option>
+                <option value="7">Semester 7</option>
+              </select>
+            </div>
+            <div class="form-group" id="fg-kelas">
+              <label>Kelas</label>
+              <select id="f-kelas">
+                <option value="">-- Pilih --</option>
+                <option value="A">Kelas A</option>
+                <option value="B">Kelas B</option>
+                <option value="C">Kelas C</option>
+                <option value="D">Kelas D</option>
+                <option value="E">Kelas E</option>
+                <option value="F">Kelas F</option>
+              </select>
+            </div>
+            <div class="form-group" id="fg-org" style="display:none">
+              <label>Nama Organisasi</label>
+              <select id="f-org">
+                <option value="">-- Pilih --</option>
+                <option value="BEM">BEM</option>
+                <option value="BLM">BLM</option>
+                <option value="HIMMAS">HIMMAS</option>
+                <option value="HIMAKASI">HIMAKASI</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="form-group" id="fg-kegiatan">
+              <label>Nama Kegiatan / Mata Kuliah</label>
+              <input type="text" id="f-kegiatan" placeholder="Contoh: Pengantar Manajemen" required />
+            </div>
+            <div class="form-group" id="fg-dosen">
+              <label>Dosen / PIC</label>
+              <input type="text" id="f-dosen" placeholder="Nama dosen atau penanggung jawab" />
+            </div>
+            <div class="form-group">
+              <label>Ruangan</label>
+              <select id="f-room" required>
+                <option value="">-- Pilih Ruangan --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Slot Waktu</label>
+              <select id="f-slot" required>
+                <option value="">-- Pilih Waktu --</option>
+                <option value="0">Slot 1: 07:00 – 09:00</option>
+                <option value="1">Slot 2: 09:00 – 11:00</option>
+                <option value="2">Slot 3: 11:00 – 13:00</option>
+                <option value="3">Slot 4: 13:00 – 15:00</option>
+                <option value="4">Slot 5: 15:00 – 17:00</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tanggal</label>
+              <input type="date" id="f-date" required />
+            </div>
+            <div class="form-group">
+              <label>Catatan</label>
+              <input type="text" id="f-note" placeholder="Opsional" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary btn-large">Konfirmasi Booking</button>
+            <button type="button" class="btn-secondary" onclick="resetBookingForm()">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ======== VIEW: LOG ======== -->
+    <section class="view" id="view-log">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Riwayat Aktivitas</h1>
+          <p class="page-sub">Log semua booking, pembatalan, dan perubahan status ruangan</p>
+        </div>
+        <button class="btn-danger" onclick="clearAllData()">Hapus Semua Data</button>
+      </div>
+      <div id="log-container" class="log-container"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== MODAL: ROOM DETAIL / BOOKING ===== -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div class="toast" id="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
