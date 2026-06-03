@@ -33,8 +33,7 @@ feb-classroom/
 
 | Keterangan         | Jumlah |
 |--------------------|--------|
-| Total Mahasiswa    | 1.920  |
-| Per Angkatan       | 480    |
+| Total Mahasiswa    | 1.742  |
 | Jumlah Angkatan    | 4      |
 | Manajemen/angkatan | 6 kelas (A–F) |
 | Akuntansi/angkatan | 6 kelas (A–F) |
